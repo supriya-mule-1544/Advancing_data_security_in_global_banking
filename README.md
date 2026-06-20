@@ -1,174 +1,268 @@
-# Advancing_data_security_in_global_banking
-# Advancing Data Security in Global Banking: Innovative Big Data Management Techniques
+# Credit Card Default Prediction Using Machine Learning
 
-**Student:** Supriya | SRN: 23070872
-**Programme:** M.Sc. Data Science — University of Hertfordshire
-**Module:** 7PAM2002
-**Supervisor:** Stephen Kane
-**Date Submitted:** 22 April 2026
+## MSc Data Science Project
+
+### Project Overview
+
+This project investigates credit card default prediction using machine learning techniques on the UCI Credit Card Default Dataset. The objective is to identify customers who are likely to default on their credit card payments, enabling financial institutions to improve risk management and lending decisions.
+
+The project follows a complete machine learning pipeline including:
+
+* Exploratory Data Analysis (EDA)
+* Data Preprocessing
+* Feature Engineering
+* Class Imbalance Handling using SMOTE
+* Machine Learning Model Development
+* Hyperparameter Tuning
+* Model Evaluation and Comparison
 
 ---
 
-## Project Overview
+## Business Problem
 
-This project applies machine learning to predict credit card default using a real-world dataset of 30,000 clients from a Taiwanese commercial bank. Three classification models — Logistic Regression, Random Forest, and XGBoost — are trained, tuned, and compared to identify the best-performing approach for credit risk prediction in banking.
+Credit card defaults represent a significant financial risk for banks and financial institutions. Early identification of high-risk customers can help reduce losses and support more informed credit decisions.
 
-The core research question is:
+The dataset exhibits class imbalance, with approximately:
 
-> *Which machine learning algorithm performs best among Logistic Regression, Random Forest, and XGBoost for predicting credit card default, in terms of Accuracy, Precision, Recall, and F1 Score?*
+* 78% Non-Default Customers
+* 22% Default Customers
+
+Therefore, traditional accuracy metrics alone are insufficient for model evaluation.
 
 ---
 
 ## Dataset
 
-- **Name:** Default of Credit Card Clients
-- **Source:** [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/350/default+of+credit+card+clients)
-- **Format:** .xls (structured tabular data)
-- **Size:** 30,000 rows × 25 columns
-- **Target Variable:** `default_payment_next_month` (0 = No Default, 1 = Default)
-- **Class Distribution:** ~78% Non-default | ~22% Default (imbalanced)
+**Source:** UCI Machine Learning Repository
 
-### Key Features
+**Dataset:** Default of Credit Card Clients Dataset
 
-| Feature | Description |
-|---|---|
-| `LIMIT_BAL` | Credit limit in New Taiwan Dollars |
-| `SEX`, `EDUCATION`, `MARRIAGE`, `AGE` | Client demographics |
-| `PAY_0` – `PAY_6` | Repayment status for the past 6 months |
-| `BILL_AMT1` – `BILL_AMT6` | Monthly bill statement amounts |
-| `PAY_AMT1` – `PAY_AMT6` | Monthly payment amounts |
-| `default_payment_next_month` | Target variable (binary) |
+### Dataset Characteristics
 
----
+* 30,000 customer records
+* 24 original attributes
+* Demographic information
+* Credit limit information
+* Repayment status history
+* Monthly bill amounts
+* Monthly payment amounts
 
-## Project Structure
+### Target Variable
 
-```
-├── default_of_credit_card_clients.xls   # Raw dataset
-├── Untitled10.ipynb                      # Main Jupyter notebook (full ML pipeline)
-├── EV_ML_Presentation.pptx              # Project presentation slides
-└── README.md                            # This file
-```
+`default_payment_next_month`
+
+* 0 = No Default
+* 1 = Default
 
 ---
 
 ## Methodology
 
-The project follows a structured end-to-end machine learning pipeline:
+### 1. Exploratory Data Analysis
 
-1. **Exploratory Data Analysis (EDA)** — target distribution, correlation heatmap, categorical inspection
-2. **Data Preprocessing** — dropped `ID` column, fixed irregular `EDUCATION` and `MARRIAGE` values, standardised column names, applied `StandardScaler` for Logistic Regression
-3. **Feature Engineering** — created 9 new features from billing and payment history:
-   - `avg_bill_amt`, `avg_pay_amt`, `max_bill_amt`
-   - `max_pay_delay`, `avg_pay_delay`
-   - `total_bill_amt`, `total_pay_amt`
-   - `pay_to_bill_ratio`, `utilization_ratio`
-4. **Train-Test Split** — 80/20 stratified split (`random_state=42`)
-5. **Model Training** — Logistic Regression, Random Forest, XGBoost
-6. **Hyperparameter Tuning** — GridSearchCV with Stratified K-Fold (3 folds), optimising for F1 Score
-7. **Evaluation** — Accuracy, Precision, Recall, F1 Score, ROC-AUC, Confusion Matrix
+EDA was conducted to:
+
+* Understand feature distributions
+* Detect class imbalance
+* Examine repayment behaviour
+* Analyse feature correlations
+* Identify important predictive variables
+
+Key findings:
+
+* Strong class imbalance
+* PAY_0 showed the strongest correlation with default
+* Bill amount variables exhibited high multicollinearity
+* Financial variables were highly right-skewed
 
 ---
 
-## Models
+### 2. Data Preprocessing
 
-| Model | Key Settings |
-|---|---|
-| Logistic Regression | `class_weight='balanced'`, `max_iter=2000` |
-| Random Forest | `class_weight='balanced'`, `n_estimators=100` |
-| XGBoost | `scale_pos_weight` set to negative/positive ratio |
+The following preprocessing steps were performed:
+
+* Removal of ID column
+* Correction of categorical values
+* Train-test split using stratification
+* Feature scaling for Logistic Regression
+* Data quality validation
+
+---
+
+### 3. Feature Engineering
+
+To improve predictive performance, several behavioural features were created:
+
+| Feature           | Description              |
+| ----------------- | ------------------------ |
+| avg_pay_delay     | Average repayment delay  |
+| max_pay_delay     | Maximum repayment delay  |
+| avg_bill_amt      | Average bill amount      |
+| max_bill_amt      | Maximum bill amount      |
+| total_bill_amt    | Total bill amount        |
+| total_pay_amt     | Total payment amount     |
+| utilization_ratio | Credit utilization ratio |
+| pay_to_bill_ratio | Payment-to-bill ratio    |
+
+These engineered features capture customer repayment behaviour more effectively than individual monthly variables.
+
+---
+
+### 4. Handling Class Imbalance
+
+SMOTE (Synthetic Minority Oversampling Technique) was applied to the training dataset to address class imbalance.
+
+Benefits:
+
+* Improved minority-class learning
+* Increased Recall
+* Improved F1 Score
+* Reduced bias toward majority class predictions
+
+---
+
+## Models Implemented
+
+### Logistic Regression
+
+Used as a baseline linear classification model.
+
+### Random Forest
+
+Ensemble learning algorithm based on bagging and decision trees.
+
+### XGBoost
+
+Gradient boosting algorithm selected for its strong performance on structured tabular datasets.
+
+---
+
+## Hyperparameter Tuning
+
+GridSearchCV with Stratified 3-Fold Cross Validation was used to optimise model parameters.
+
+Primary optimisation metric:
+
+**F1 Score**
+
+---
+
+## Evaluation Metrics
+
+The following metrics were used:
+
+* Accuracy
+* Precision
+* Recall
+* F1 Score
+* ROC-AUC
+
+F1 Score was selected as the primary evaluation metric because of the imbalanced nature of the dataset.
 
 ---
 
 ## Results
 
-### Baseline (Before Tuning)
+| Model               | F1 Score | ROC-AUC |
+| ------------------- | -------- | ------- |
+| Logistic Regression | ~0.43    | ~0.70   |
+| Random Forest       | ~0.50    | ~0.75   |
+| XGBoost             | ~0.51    | ~0.77   |
 
-| Model | Accuracy | Precision | Recall | F1 Score |
-|---|---|---|---|---|
-| Logistic Regression | 0.808 | 0.688 | 0.241 | 0.357 |
-| Random Forest | 0.815 | 0.642 | 0.366 | 0.466 |
-| XGBoost | 0.809 | 0.616 | 0.362 | 0.456 |
+### Best Performing Model
 
-### After Hyperparameter Tuning
+**XGBoost**
 
-| Model | Accuracy | Precision | Recall | F1 Score |
-|---|---|---|---|---|
-| Logistic Regression | 0.808 | 0.691 | 0.241 | 0.358 |
-| Random Forest | 0.814 | 0.639 | 0.367 | **0.466** ✅ |
-| XGBoost | 0.817 | 0.657 | 0.357 | 0.463 |
+Reasons:
 
-**Best Model: Random Forest** — highest F1 Score (0.466) in both baseline and tuned conditions, demonstrating the best balance between Precision and Recall.
+* Highest F1 Score
+* Highest ROC-AUC
+* Strongest discrimination between default and non-default customers
 
-> F1 Score is used as the primary metric due to class imbalance. A model that only maximises accuracy would trivially predict "No Default" ~78% of the time without identifying any real risk.
+---
+
+## Feature Importance Insights
+
+Random Forest feature importance analysis revealed that repayment behaviour variables are the strongest predictors of default.
+
+Top features included:
+
+* avg_pay_delay
+* max_pay_delay
+* PAY_0
+* utilization_ratio
+* pay_to_bill_ratio
+
+This validates the effectiveness of the feature engineering process.
 
 ---
 
 ## Key Findings
 
-- **Repayment status (PAY_0)** is the strongest single predictor of credit default — clients with recent payment delays are at significantly higher risk.
-- **Random Forest** outperforms Logistic Regression and XGBoost on F1 Score, thanks to its ensemble averaging approach which handles class imbalance and non-linear patterns effectively.
-- **Logistic Regression** achieves high precision but very low recall (0.241), meaning it misses ~75% of actual default cases — unsuitable for practical deployment.
-- **XGBoost** achieves the highest accuracy after tuning (81.7%) but falls marginally behind Random Forest on F1 Score.
-- **Feature engineering** expanded the feature space from 24 to 33 variables, capturing aggregate financial behaviour such as credit utilisation and repayment coverage ratios.
-- **Hyperparameter tuning** produced modest but consistent improvements; the gains were most meaningful for Random Forest and XGBoost.
+* Repayment behaviour is the strongest predictor of default.
+* Class imbalance significantly affects model performance.
+* SMOTE improves detection of default customers.
+* Ensemble methods outperform Logistic Regression.
+* XGBoost achieved the best overall performance.
 
 ---
 
-## How to Run
+## Technologies Used
 
-### Requirements
+### Programming Language
 
-```bash
-pip install pandas numpy matplotlib seaborn scikit-learn xgboost openpyxl
+* Python
+
+### Libraries
+
+* Pandas
+* NumPy
+* Matplotlib
+* Seaborn
+* Scikit-Learn
+* Imbalanced-Learn (SMOTE)
+* XGBoost
+
+---
+
+## Project Structure
+
+```text
+├── Credit_Default_Prediction.ipynb
+├── Project_Report.pdf
+├── README.md
+├── figures/
+│   ├── eda_plots
+│   ├── correlation_heatmap
+│   ├── confusion_matrices
+│   ├── roc_curves
+│   └── feature_importance
+└── data/
+    └── credit_card_default.csv
 ```
 
-### Steps
+## Future Improvements
 
-1. Clone or download this repository
-2. Place the dataset file (`default_of_credit_card_clients.xls`) in the same directory
-3. Open `Untitled10.ipynb` in Jupyter Notebook or Google Colab
-4. Run all cells in order from top to bottom
-
-The notebook covers the full pipeline: data loading → EDA → preprocessing → feature engineering → model training → hyperparameter tuning → evaluation and comparison.
-
-> **Google Colab link:** https://colab.research.google.com/drive/13Af7Jw5x8udkUlnMwQWrNeFfKjQXuiw_?usp=sharing
+* SHAP Explainability Analysis
+* Cost-Sensitive Learning
+* Threshold Optimisation
+* Deep Learning Approaches
+* External Dataset Validation
+* Real-Time Credit Risk Scoring
 
 ---
 
-## Ethical Considerations
+## Academic Context
 
-- The dataset is **publicly available** from UCI and contains **no personally identifiable information (PII)**
-- All client identifiers are anonymised numeric codes
-- The dataset was used **exclusively for academic research**
-- No data was shared with third parties
-- Demographic features (SEX, EDUCATION, MARRIAGE) are included as per the original benchmark — any real-world deployment would require bias auditing and fairness analysis
+This project was completed as part of an MSc Data Science programme and demonstrates the application of machine learning techniques to real-world financial risk prediction problems.
 
 ---
 
-## Future Work
+## Author
 
-- Apply **SMOTE** or **ADASYN** oversampling to better address class imbalance and improve recall
-- Incorporate richer features: customer income, employment status, credit bureau data
-- Explore **deep learning** approaches (fully connected networks, attention-based models)
-- Apply **SHAP** or **LIME** for model explainability and feature attribution
-- Extend to **real-time prediction** pipelines for production banking environments
-- Validate across multiple institutions and regions for generalisation
+Supriya
 
----
+MSc Data Science
 
-## References
+Machine Learning  | Financial Risk Modelling
 
-- Yeh, I.-C., & Lien, C.-H. (2009). The comparisons of data mining techniques for the predictive accuracy of probability of default of credit card clients. *Expert Systems with Applications*, 36(2), 2473–2480.
-- Lessmann, S., et al. (2015). Benchmarking state-of-the-art classification algorithms for credit scoring. *European Journal of Operational Research*, 247(1), 124–136.
-- Brown, I., & Mues, C. (2012). An experimental comparison of classification algorithms for imbalanced credit scoring data sets. *Expert Systems with Applications*, 39(3), 3446–3453.
-- Xia, Y., et al. (2018). A boosted decision tree approach using Bayesian hyper-parameter optimization for credit scoring. *Expert Systems with Applications*, 78, 225–241.
-- Chen, T., & Guestrin, C. (2016). XGBoost: A scalable tree boosting system. *Proceedings of KDD '16*, 785–794.
-- Breiman, L. (2001). Random forests. *Machine Learning*, 45(1), 5–32.
-- Pedregosa, F., et al. (2011). Scikit-learn: Machine learning in Python. *Journal of Machine Learning Research*, 12, 2825–2830.
-- UCI Machine Learning Repository. (2016). Default of Credit Card Clients Dataset. https://archive.ics.uci.edu/dataset/350/default+of+credit+card+clients
-- He, H., & Garcia, E. A. (2009). Learning from imbalanced data. *IEEE Transactions on Knowledge and Data Engineering*, 21(9), 1263–1284.
-
----
-
-*M.Sc. Data Science | University of Hertfordshire | 7PAM2002*
